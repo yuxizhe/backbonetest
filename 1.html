@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>the5fire.com-backbone.js-Hello World</title>
+</head>
+<body>
+    <form>
+    First name: <input type="text" id="firstname"><br>
+    Age: <input type="text" id ="age">
+    </form>
+
+    <button id="check">添加</button>
+
+    <ul id="world-list">
+    </ul>
+    <a href="http://www.the5fire.com">更多教程</a>
+    <script src="http://the5fireblog.b0.upaiyun.com/staticfile/jquery-1.10.2.js"></script>
+    <script src="http://the5fireblog.b0.upaiyun.com/staticfile/underscore.js"></script>
+    <script src="http://the5fireblog.b0.upaiyun.com/staticfile/backbone.js"></script>
+
+    <script type="text/template" id="item_view">
+        <li>Firstname <b> <%= name %> </b> age :    <%= age %></li>
+    </script>
+
+    <script>
+    (function ($) {
+        World = Backbone.Model.extend({
+            default:{
+                name: '测试',
+                age: '11'
+            },
+
+            initialize: function(){
+                alert(this.get('name')+ '   age:'+ this.get('age'))      //获取传入方法
+            },
+
+            
+
+            
+        });
+ 
+        Worlds = Backbone.Collection.extend({
+            //World对象的集合
+            initialize: function (models, options) {
+                    this.bind("add", options.view.addOneWorld);
+            }
+        });
+
+        AppView = Backbone.View.extend({
+            el: $("body"),
+            initialize: function () {
+                //构造函数，实例化一个World集合类
+                //并且以字典方式传入AppView的对象
+                this.worlds = new Worlds(null, { view : this })
+            },
+            events: {
+                //事件绑定，绑定Dom中id为check的元素
+                "click #check":  "checkIn",
+            },
+
+            //Template: _.template($('#item_view').html()),
+
+            checkIn: function () {
+                var world_name = $('#firstname').val();
+                var world_age = $('#age').val();
+                if(world_name == "") world_name = '未知';
+                var world = new World({ name: world_name ,age: world_age});
+                this.worlds.add(world);
+                $('#firstname').val('');
+                $('#age').val('');
+
+            },
+            addOneWorld: function(model) {
+                var Template = _.template($('#item_view').html());
+                $("#world-list").append(Template({name:model.get('name'),age:model.get('age')}));
+            }
+        });
+        //实例化AppView
+        var appview = new AppView;
+    })(jQuery);
+    </script>
+</body>
+</html>
