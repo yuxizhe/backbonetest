@@ -21,6 +21,7 @@
 
     <script type="text/template" id="item_view">
         <li>Firstname <b> <%= name %> </b> age :    <%= age %></li>
+    <a class = "destroy"> 删除 </a>
     </script>
 
     <script>
@@ -31,9 +32,9 @@
                 age: '11'
             },
 
-            initialize: function(){
-                alert(this.get('name')+ '   age:'+ this.get('age'))      //获取传入方法
-            },
+            // initialize: function(){
+            //     alert(this.get('name')+ '   age:'+ this.get('age'))      //获取传入方法
+            // },
 
             
 
@@ -42,10 +43,6 @@
  
         Worlds = Backbone.Collection.extend({
             model:World
-            //World对象的集合
-            // initialize: function (models, options) {
-            //         this.bind("add", options.view.addOneWorld);
-            // }
         });
 
         var todos = new Worlds;
@@ -58,8 +55,16 @@
 
             template: _.template($('#item_view').html()),
 
+            events:{
+                "click .destroy" :"clear"
+            },
+            clear:function(){
+                this.model.destroy();
+            },
+
             initialize: function(){
                 this.listenTo(this.model, 'change' , this.render);
+                this.listenTo(this.model, 'destroy', this.remove)
             },
 
             render: function(){
@@ -72,8 +77,6 @@
             el: $("body"),
             initialize: function () {
                 //构造函数，实例化一个World集合类
-                //并且以字典方式传入AppView的对象
-                // this.worlds = new Worlds(null, { view : this })
                 this.listenTo(todos, 'add', this.addOne);
             },
             events: {
@@ -95,8 +98,13 @@
 
             },
             addOne: function(tododata) {
-                var view = new todoView({model: tododata});   //这个地方传入数据
+                var view = new todoView({model: tododata});   //这个地方传入数据  
                 $("#world-list").append(view.render().el);
+                // this.$el.append(view.render().el);
+            },
+            addAll:function(){
+                $("#world-list").empty();
+                todos.each(this.addOne,this);
             }
         });
         //实例化AppView
